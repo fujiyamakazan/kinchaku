@@ -12,11 +12,16 @@ import java.util.zip.ZipInputStream;
 
 public class ZipUtils {
 
-    public static void unzip(File jar, UnzipTask unzipTask) {
+    /**
+     * Zipファイルを展開し、エントリーごとに処理します。
+     * @param zip 展開するZIPファイル
+     * @param unzipTask エントリーごとの処理
+     */
+    public static void unzip(File zip, UnzipTask unzipTask) {
 
         // FIXME https://www.jpcert.or.jp/java-rules/ids04-j.html
         try (
-            FileInputStream fis = new FileInputStream(jar);
+            FileInputStream fis = new FileInputStream(zip);
             BufferedInputStream bis = new BufferedInputStream(fis);
             //ZipInputStream zis = new ZipInputStream(bis, Charset.forName("MS932"));) {
             ZipInputStream zis = new ZipInputStream(bis);) {

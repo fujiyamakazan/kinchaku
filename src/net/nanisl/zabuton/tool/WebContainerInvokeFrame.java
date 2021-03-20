@@ -87,7 +87,6 @@ public class WebContainerInvokeFrame extends JFrame {
                     startButton.setText("[" + getTitle() + "]へ");
                 } else {
                     startButton.setEnabled(false);
-                    startButton.setText("[" + getTitle() + "]は準備中です...");
                 }
             }
         };
@@ -137,6 +136,8 @@ public class WebContainerInvokeFrame extends JFrame {
         panel.add(startButton, BorderLayout.CENTER); // パネルに配置
         startButton.setSize(150, 80);
         startButton.setFont(new Font(FONT, Font.PLAIN, 20));
+        startButton.setText("[" + getTitle() + "]は準備中です...");
+        startButton.setEnabled(false);
         startButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {

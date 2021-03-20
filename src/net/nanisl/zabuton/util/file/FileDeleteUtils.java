@@ -5,16 +5,20 @@ import java.io.Serializable;
 
 public class FileDeleteUtils implements Serializable {
 
-	private static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
 
-	public static void delete(File file) {
-		if (file.isDirectory()) {
-			for (File sub: file.listFiles()) {
-				delete(sub);
-			}
-		}
-		if (file.delete() == false) {
-			throw new RuntimeException("Delete Failure " + file.getAbsolutePath());
-		}
-	}
+    /**
+     * 再帰的にファイルを削除します。
+     * @param target 削除対象
+     */
+    public static void delete(File target) {
+        if (target.isDirectory()) {
+            for (File sub : target.listFiles()) {
+                delete(sub);
+            }
+        }
+        if (target.delete() == false) {
+            throw new RuntimeException("Delete Failure " + target.getAbsolutePath());
+        }
+    }
 }
