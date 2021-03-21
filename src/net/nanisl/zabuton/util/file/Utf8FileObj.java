@@ -12,7 +12,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.wicket.util.lang.Generics;
 
 /**
- * UTF-8のテキストファイルを操作するオブジェクトです。
+ *文字セット「UTF-8」を指定してテキストファイルを操作します。
  * @author fujiyama
  */
 public class Utf8FileObj implements Serializable {
@@ -21,10 +21,21 @@ public class Utf8FileObj implements Serializable {
 
     public static final Charset CHARSET = StandardCharsets.UTF_8;
 
+    /**
+     * 改行コードはプラットフォームにより異なります。
+     * Windows：\r\n, Linux：\n, Mac：\n\r
+     * いずれのプラットフォームにも共通する「\n」を定数として宣言します。
+     */
+    public static final String LINE_SEPARATOR_LF = "\n";
+
     protected final File file;
 
     public Utf8FileObj(File file) {
         this.file = file;
+    }
+
+    public Utf8FileObj(String pathname) {
+        this(new File(pathname));
     }
 
     public static Utf8FileObj of(File file) {
@@ -32,8 +43,82 @@ public class Utf8FileObj implements Serializable {
     }
 
     /**
-     * ファイルの内容をStringで返却します。
-     * @return
+     * 文字セット「UTF-8」を指定してテキストを保存します。
+     * @param data テキスト
+     */
+    public void writeString(String data) {
+        writeString(data, false);
+    }
+
+    /**
+     * 文字セット「UTF-8」を指定してテキストを保存します。
+     * @param data テキスト
+     * @param append 追記モードを指定する場合はTrue
+     */
+    public void writeString(String data, boolean append) {
+        try {
+            FileUtils.write(file, data, CHARSET, append);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     * 文字セット「UTF-8」を指定して複数行のテキストを保存します。
+     * @param lines 複数行のテキスト
+     */
+    public void writeListString(List<String> lines) {
+        try {
+            FileUtils.writeLines(file, CHARSET.toString(), lines);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    /**
+     * 文字セット「UTF-8」を指定してファイルから複数行のテキストを取得します。
+     * 先頭にBOMがあれば除外します。
+     * 各行はトリムされ、改行コードを含みません。
+     * 空行は除外します。
+     * @return ファイルから取得したテキスト。ファイルが無ければ空のリストを返します。
+     */
+    public List<String> readLines() {
+        return readLines(null);
+    }
+
+    /**
+     * 文字セット「UTF-8」を指定してファイルから複数行のテキストを取得します。
+     * 先頭にBOMがあれば除外します。
+     * 各行はトリムされ、改行コードを含みません。
+     * 空行は除外します。
+     * ignoreHead からはじまる行（コメント行）は除外します。
+     * @return ファイルから取得したテキスト。ファイルが無ければ空のリストを返します。
+     */
+    public List<String> readLines(String ignoreHead) {
+        String string = readFileToString();
+        if (string == null) {
+            return Generics.newArrayList();
+        }
+        List<String> lines = Generics.newArrayList();
+        for (String line : string.split(LINE_SEPARATOR_LF)) {
+            line = line.trim();
+            if (StringUtils.isEmpty(line)) {
+                continue; // 空行スキップ
+            }
+            if (StringUtils.isNotEmpty(ignoreHead)) {
+                if (StringUtils.startsWith(line, ignoreHead)) {
+                    continue; // コメント行スキップ
+                }
+            }
+            lines.add(line);
+        }
+        return lines;
+    }
+
+    /**
+     * 文字セット「UTF-8」を指定してファイルからテキストを取得します。
+     * 先頭にBOMがあれば除外します。
+     * @return ファイルから取得したテキスト。ファイルが無ければnullを返します。
      */
     public String readFileToString() {
         if (file.exists() == false) {
@@ -48,7 +133,7 @@ public class Utf8FileObj implements Serializable {
         }
         /* 先頭にBOMがあれば除去する */
         if (text == null || text.length() == 0) {
-            // 空は対象外
+            /* 処理なし */
         } else {
             String first = Integer.toHexString(text.charAt(0));
             if (StringUtils.equals(first, "feff")) {
@@ -58,70 +143,4 @@ public class Utf8FileObj implements Serializable {
         return text;
 
     }
-
-    public void writeString(String text) {
-        try {
-            FileUtils.write(file, text, CHARSET);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    public void writeString(String text, boolean append) {
-        try {
-            FileUtils.write(file, text, CHARSET, append);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    public void writeListString(List<String> lines) {
-        try {
-            FileUtils.writeLines(file, CHARSET.toString(), lines);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    public List<String> readLines() {
-        return readLines(null);
-    }
-
-    public List<String> readLines(String commentHeader) {
-        List<String> lines = Generics.newArrayList();
-        for (String line : readFileToString().split("\n")) {
-            line = line.trim();
-            if (StringUtils.isEmpty(line)) {
-                continue;
-            }
-            if (StringUtils.isNotEmpty(commentHeader)) {
-                if (StringUtils.startsWith(line, commentHeader)) {
-                    continue;
-                }
-            }
-
-            lines.add(line);
-        }
-        return lines;
-    }
-
-    /**
-     * @return 行ごとのリスト。要素はトリムし、空文字は除外したもの。
-     */
-    public List<String> readTrimeLinesIgnoreEmpty() {
-        List<String> list = Generics.newArrayList();
-        for (String line : readLines()) {
-            line = line.trim();
-            if (StringUtils.isNotEmpty(line)) {
-                list.add(line);
-            }
-        }
-        return list;
-    }
-
-    @Override
-    public String toString() {
-        return readFileToString();
-    }
-
 }
