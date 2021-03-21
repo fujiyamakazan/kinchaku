@@ -41,20 +41,26 @@ public abstract class AbstractWebContainerStarter {
     public boolean isRunning() {
         return running;
     }
-
-
-    private int port = DEFAULT_PORT;
+    private int port;
 
     private String subParams;
 
     public AbstractWebContainerStarter(Class<?> appClass) {
         this.appClass = appClass;
+        this.port = getPortStart();
     }
+
 
     public AbstractWebContainerStarter(Class<?> appClass, String subParams) {
         this.appClass = appClass;
         this.subParams = subParams;
+        this.port = getPortStart();
     }
+
+    protected int getPortStart() {
+        return DEFAULT_PORT;
+    }
+
 
     /**
      * ポートをチェックして、Webコンテナを開始します。
@@ -195,7 +201,7 @@ public abstract class AbstractWebContainerStarter {
     /**
      * portが使用済みの時にthrowする例外です。
      */
-    protected class PortAlreadyException extends Exception {
+    public class PortAlreadyException extends Exception {
         private static final long serialVersionUID = 1L;
 
     }
