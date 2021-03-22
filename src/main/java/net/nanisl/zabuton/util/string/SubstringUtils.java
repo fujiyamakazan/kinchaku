@@ -1,7 +1,7 @@
 package net.nanisl.zabuton.util.string;
 
 /**
- * 文字列を部分取得するユーティリティ
+ * 部分文字列に関する操作をします。
  * @author fuijyama
  */
 public class SubstringUtils {
@@ -88,6 +88,18 @@ public class SubstringUtils {
      */
     public static String right(String src, String delimiter) {
         final int index = src.lastIndexOf(delimiter);
+        return rightCore(src, delimiter, index);
+    }
+
+    /**
+     * @return delimiterより右側の部分(区切り文字は前方一致とする)
+     */
+    public static String rightOfFirst(String src, String delimiter) {
+        final int index = src.indexOf(delimiter);
+        return rightCore(src, delimiter, index);
+    }
+
+    private static String rightCore(String src, String delimiter, final int index) {
         try {
             return src.substring(index + delimiter.length());
         } catch (Exception e) {

@@ -74,4 +74,8 @@ public abstract class KeyValuesFileObj implements Serializable {
             this.keyValueString.add(new KeyValueString(key, value));
         }
     }
+
+    protected static String nulToBlank(String value) {
+        return value == null ? "" : value;
+    }
 }

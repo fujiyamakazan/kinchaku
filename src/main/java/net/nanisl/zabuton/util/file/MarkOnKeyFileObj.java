@@ -72,7 +72,7 @@ public class MarkOnKeyFileObj extends KeyValuesFileObj {
         List<String> lines = Generics.newArrayList();
         for (KeyValueString keyValue : super.keyValueString) {
             lines.add(MARK + keyValue.getKey());
-            lines.add(keyValue.getValue());
+            lines.add(nulToBlank(keyValue.getValue()));
         }
         utf8File.writeListString(lines);
     }

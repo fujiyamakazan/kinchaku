@@ -2,9 +2,11 @@ package net.nanisl.zabuton.util.file;
 
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.wicket.util.lang.Generics;
 
 import net.nanisl.zabuton.util.KeyValueString;
+import net.nanisl.zabuton.util.string.SubstringUtils;
 
 /**
  * セパレーターで分割された「キー」と「値」で構成される
@@ -37,8 +39,16 @@ public class SeparateKeyFileObj extends KeyValuesFileObj {
 
         List<String> lines = utf8File.readLines();
         for (String line : lines) {
-            String[] split = line.split(SEPARATOR);
-            results.add(new KeyValueString(split[0], split[1]));
+            if (line.contains(SEPARATOR)) {
+                final String key = SubstringUtils.left(line, SEPARATOR);
+                final String value;
+                if (StringUtils.endsWith(line, SEPARATOR)) {
+                    value = "";
+                } else {
+                    value = SubstringUtils.rightOfFirst(line, SEPARATOR);
+                }
+                results.add(new KeyValueString(key, value));
+            }
         }
         return results;
     }
@@ -47,7 +57,7 @@ public class SeparateKeyFileObj extends KeyValuesFileObj {
     public void write() {
         List<String> lines = Generics.newArrayList();
         for (KeyValueString keyValue : super.keyValueString) {
-            lines.add(keyValue.getKey() + SEPARATOR + keyValue.getValue());
+            lines.add(keyValue.getKey() + SEPARATOR + nulToBlank(keyValue.getValue()));
         }
         utf8File.writeListString(lines);
     }
