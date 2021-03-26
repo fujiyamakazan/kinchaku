@@ -112,6 +112,8 @@ public class FileDropPanel extends Panel {
                 objects.clear();
                 objects.addAll(files);
                 target.add(list);
+                FileDropPanel.this.afterFileUpload(target, files);
+
             }
 
             @Override
@@ -119,6 +121,10 @@ public class FileDropPanel extends Panel {
                 log.error(e.getMessage());
             }
         });
+    }
+
+    protected void afterFileUpload(AjaxRequestTarget target, List<FileUpload> files) {
+        /* 処理なし */
     }
 
 }
