@@ -36,16 +36,24 @@ public class FileDropPanel extends Panel {
      */
     private transient ArrayList<FileUpload> fileUploads = Generics.newArrayList();
 
+    private boolean single;
+
     public List<FileUpload> getFiles() {
         return fileUploads;
     }
 
+    public FileDropPanel(String id) {
+        this(id, false);
+    }
+
     /**
      * コンストラクタ。
-     * @param id id
+     * @param id wicket:id
+     * @param single シングルモード指定
      */
-    public FileDropPanel(String id) {
+    public FileDropPanel(String id, boolean single) {
         super(id);
+        this.single = single;
     }
 
     private class FileInfo implements Serializable {
@@ -101,7 +109,10 @@ public class FileDropPanel extends Panel {
                 });
             }
         });
-        /* ファイルドロップのイベント */
+
+        /*
+         * ファイルドロップのイベント
+         */
         add(new AjaxFileDropBehavior() {
             private static final long serialVersionUID = 1L;
 
@@ -110,8 +121,14 @@ public class FileDropPanel extends Panel {
 
                 List<FileUpload> objects = FileDropPanel.this.fileUploads;
                 objects.clear();
-                objects.addAll(files);
+
+                if (FileDropPanel.this.single && files.isEmpty() == false) {
+                    objects.add(files.get(0));
+                } else {
+                    objects.addAll(files);
+                }
                 target.add(list);
+
                 FileDropPanel.this.afterFileUpload(target, files);
 
             }
@@ -125,6 +142,18 @@ public class FileDropPanel extends Panel {
 
     protected void afterFileUpload(AjaxRequestTarget target, List<FileUpload> files) {
         /* 処理なし */
+    }
+
+    /**
+     * アップロードされたファイルを１つだけ返却します。
+     * @return アップロードされたファイル。ファイルがなければnullを返す。
+     */
+    public FileUpload getFileSingle() {
+        if (FileDropPanel.this.fileUploads.isEmpty()) {
+            return null;
+        } else {
+            return FileDropPanel.this.fileUploads.get(0);
+        }
     }
 
 }
