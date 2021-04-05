@@ -16,6 +16,7 @@ import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.regex.Pattern;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.wicket.util.lang.Generics;
 import org.slf4j.Logger;
@@ -72,12 +73,13 @@ public class ResourceUtils {
                 throw new RuntimeException(path + " not found.");
             }
             reader = new BufferedReader(new InputStreamReader(inputStream, CHARSET));
-            StringBuilder sb = new StringBuilder();
-            String line;
-            while ((line = reader.readLine()) != null) {
-                sb.append(line);
-            }
-            return sb.toString();
+//            StringBuilder sb = new StringBuilder();
+//            String line;
+//            while ((line = reader.readLine()) != null) {
+//                sb.append(line);
+//            }
+//            return sb.toString();
+            return IOUtils.toString(reader);
 
         } catch (IOException e) {
             throw new RuntimeException(e);

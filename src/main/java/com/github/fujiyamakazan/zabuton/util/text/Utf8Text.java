@@ -139,4 +139,8 @@ public class Utf8Text implements Serializable {
         }
     }
 
+    public File getFile() {
+        return file;
+    }
+
 }
