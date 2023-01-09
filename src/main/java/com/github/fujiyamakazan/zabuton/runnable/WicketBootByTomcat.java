@@ -18,7 +18,6 @@ import com.github.fujiyamakazan.zabuton.tool.AbstractWebContainerStarter;
 
 /**
  * アプリケーションをTomcatで起動します。
- *
  * @author fujiyama
  */
 public class WicketBootByTomcat extends AbstractWebContainerStarter {
@@ -32,8 +31,6 @@ public class WicketBootByTomcat extends AbstractWebContainerStarter {
     public WicketBootByTomcat(Class<?> appClass, String subParams) {
         super(appClass, subParams);
     }
-
-
 
     @Override
     public void startServer(
